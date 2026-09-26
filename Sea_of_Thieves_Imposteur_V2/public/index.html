@@ -25,7 +25,7 @@ button{border:0;border-radius:13px;padding:13px 17px;background:linear-gradient(
 .mission{padding:16px;border-radius:16px;background:#ffffff08;border:1px solid #ffffff12;display:flex;gap:13px;align-items:flex-start}.mission.done{opacity:.55}.mission .num{font:900 24px Cinzel;color:var(--gold2)}.mission button{margin-left:auto;white-space:nowrap}
 .voteGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.vote{background:#ffffff08;color:white;border:1px solid #fff2}.result{padding:11px 13px;border-radius:12px;background:#ffffff08;margin:7px 0}.winner{border-color:#d6ad5c77;background:#3b2c13aa}
 .timer{font:900 48px Cinzel;text-align:center;color:var(--gold2);margin:5px}.footer{display:flex;justify-content:space-between;gap:12px;opacity:.65;font-size:12px;padding:25px 5px}
-#egg{position:fixed;inset:0;background:#000d;display:none;place-items:center;z-index:50;padding:18px}.treasure{max-width:700px;width:100%;background:#111;border:3px solid var(--gold);border-radius:18px;box-shadow:0 0 80px #000}.treasure img{width:100%;display:block;border-radius:15px 15px 0 0}.treasure button{width:100%;border-radius:0 0 14px 14px}
+#egg{position:fixed;inset:0;background:#000d;display:none;place-items:center;z-index:50;padding:18px;overflow:auto}.treasure{max-width:700px;width:min(700px,100%);max-height:calc(100vh - 36px);overflow:auto;background:#111;border:3px solid var(--gold);border-radius:18px;box-shadow:0 0 80px #000;position:relative}.treasure img{width:100%;max-height:calc(100vh - 120px);object-fit:contain;display:block;border-radius:15px 15px 0 0}.treasure button{width:100%;border-radius:0 0 14px 14px}.eggClose{position:absolute;right:10px;top:10px;width:44px!important;height:44px;padding:0!important;border-radius:50%!important;background:#111d!important;border:2px solid var(--gold)!important;color:#fff!important;font-size:25px!important;line-height:1;z-index:2;box-shadow:0 4px 14px #000}.eggClose:hover{transform:scale(1.05)}
 .compass{position:fixed;right:14px;bottom:14px;width:43px;height:43px;border-radius:50%;padding:0;opacity:.24;background:var(--gold);color:#20170b;z-index:30}
 hr{border:0;border-top:1px solid #fff1;margin:20px 0}
 @media(max-width:600px){.wrap{padding:12px}.panel{padding:16px}.title{letter-spacing:0}.subtitle{letter-spacing:3px}.code{font-size:32px;letter-spacing:6px}}
@@ -83,7 +83,7 @@ hr{border:0;border-top:1px solid #fff1;margin:20px 0}
 </div>
 
 <button class="compass" id="compass" title="Boussole">✦</button>
-<div id="egg"><div class="treasure"><img src="/images/hidden-treasure.jpeg"><button id="closeEgg">Fermer le coffre</button></div></div>
+<div id="egg" aria-hidden="true"><div class="treasure" role="dialog" aria-label="Trésor secret"><button id="closeEgg" class="eggClose" type="button" aria-label="Fermer">×</button><img src="/images/hidden-treasure.jpeg" alt="Trésor secret"><button id="closeEggBottom" type="button">Fermer le coffre</button></div></div>
 
 <script>
 const socket=io();let room=null,myRole=null,mySecret=null,timerInt=null,seconds=0,voted=false;
@@ -137,7 +137,12 @@ $('reset').onclick=()=>socket.emit('resetGame');
 socket.on('gameReset',()=>location.reload());
 $('musicBtn').onclick=()=>$('music').click();
 $('music').onchange=e=>{const f=e.target.files[0];if(!f)return;const a=new Audio(URL.createObjectURL(f));a.loop=true;a.volume=.5;a.play().catch(()=>{});$('musicBtn').textContent='🎵 Musique activée'};
-let clicks=0;$('compass').onclick=()=>{clicks++;if(clicks>=5){$('egg').style.display='grid';clicks=0}};
-$('closeEgg').onclick=()=>$('egg').style.display='none';
+let clicks=0;
+const closeEgg=()=>{$('egg').style.display='none';$('egg').setAttribute('aria-hidden','true')};
+$('compass').onclick=()=>{clicks++;if(clicks>=5){$('egg').style.display='grid';$('egg').setAttribute('aria-hidden','false');clicks=0}};
+$('closeEgg').onclick=closeEgg;
+$('closeEggBottom').onclick=closeEgg;
+$('egg').onclick=e=>{if(e.target===$('egg'))closeEgg()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape' && $('egg').style.display==='grid')closeEgg()});
 </script>
 </body></html>
