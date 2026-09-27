@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: sea-of-thieves-imposteur
-    runtime: node
-    plan: free
-    buildCommand: npm install
-    startCommand: npm start
-    healthCheckPath: /
