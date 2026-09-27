@@ -1,0 +1,159 @@
+
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sea Imposteur — V5</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="sea-bg"></div>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">☠</span><span>SEA <b>IMPOSTEUR</b></span></div>
+  <div id="roomBadge" class="room-badge hidden"></div>
+</header>
+
+<main>
+<section id="home" class="screen active">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">UNE AVENTURE DE DÉDUCTION</div>
+      <h1>Sea Imposteur</h1>
+      <p>Rejoignez l’équipage… ou semez le doute.</p>
+    </div>
+    <div class="wood-panel menu-panel">
+      <button class="gold-btn" onclick="openCreate()">⚓ Jouer</button>
+      <button class="dark-btn" onclick="openHelp()">📖 Aide</button>
+      <button class="dark-btn" onclick="quitGame()">Quitter</button>
+    </div>
+  </div>
+</section>
+
+<section id="create" class="screen">
+  <div class="screen-title"><span>⚓</span><h2>Créer ou rejoindre une partie</h2></div>
+  <div class="split">
+    <div class="parchment card">
+      <div class="card-icon">⚓</div><h3>Créer une partie</h3>
+      <p>Personnalise la partie et invite tes amis.</p>
+      <button class="gold-btn" onclick="showCreateForm()">Créer</button>
+    </div>
+    <div class="parchment card">
+      <div class="card-icon">⎈</div><h3>Rejoindre une partie</h3>
+      <p>Entre le code de la partie pour rejoindre.</p>
+      <input id="joinCode" placeholder="CODE DE PARTIE" maxlength="6">
+      <button class="gold-btn" onclick="joinRoom()">Rejoindre</button>
+    </div>
+  </div>
+  <button class="back" onclick="goHome()">← Retour</button>
+</section>
+
+<section id="createForm" class="screen">
+  <div class="screen-title"><span>⚓</span><h2>Préparer la traversée</h2></div>
+  <div class="wood-panel form-panel">
+    <label>Ton nom<input id="playerName" maxlength="18" placeholder="Capitaine..."></label>
+    <label>Ton avatar
+      <div id="avatars" class="avatars"></div>
+    </label>
+    <div class="settings-grid">
+      <label>Durée de la quête
+        <select id="questMinutes"><option>10</option><option>15</option><option selected>30</option><option>45</option><option>60</option></select>
+      </label>
+      <label>Entre les réunions
+        <select id="meetingInterval"><option>4</option><option selected>5</option><option>7</option><option>10</option><option>15</option><option>20</option><option>30</option></select>
+      </label>
+      <label>Durée d'une réunion
+        <select id="meetingSeconds"><option value="39">39 secondes</option><option value="60" selected>1 minute</option><option value="120">2 minutes</option><option value="180">3 minutes</option><option value="240">4 minutes</option></select>
+      </label>
+      <label>Nombre d'Imposteurs
+        <select id="impostors"><option selected>1</option><option>2</option><option>3</option><option>4</option></select>
+      </label>
+    </div>
+    <label class="toggle"><input type="checkbox" id="spyEnabled" checked><span></span> Intégrer le rôle Espion</label>
+    <button class="gold-btn wide" onclick="createRoom()">Créer la cabine</button>
+  </div>
+  <button class="back" onclick="showScreen('create')">← Retour</button>
+</section>
+
+<section id="lobby" class="screen">
+  <div class="screen-title"><span>☠</span><h2>Salon de la partie</h2></div>
+  <div class="lobby-layout">
+    <div class="wood-panel room-card">
+      <div class="code-label">Code de partie</div>
+      <div id="roomCode" class="big-code">------</div>
+      <button class="copy-btn" onclick="copyCode()">Copier</button>
+      <div class="setting-summary" id="settingSummary"></div>
+      <button id="readyBtn" class="dark-btn wide" onclick="toggleReady()">Je suis prêt</button>
+      <button id="startBtn" class="gold-btn wide hidden" onclick="startGame()">Lancer la partie</button>
+    </div>
+    <div class="wood-panel players-card">
+      <div class="players-head"><span>☠ Joueurs</span><span id="count">0/20</span></div>
+      <div id="players"></div>
+    </div>
+  </div>
+  <button class="back" onclick="leaveRoom()">← Quitter la cabine</button>
+</section>
+
+<section id="game" class="screen">
+  <div class="game-top">
+    <div class="timer-card">⎈ <span>Quête</span><b id="questTimer">00:00</b></div>
+    <div class="quest-title"><small>QUÊTE EN COURS</small><h2 id="questTitle">...</h2></div>
+    <div class="timer-card">☠ <span>Réunion</span><b id="nextMeeting">00:00</b></div>
+  </div>
+  <div class="game-layout">
+    <aside class="side-nav">
+      <button onclick="showTab('quest')">⎈<span>Quête</span></button>
+      <button onclick="showTab('journal')">📖<span>Journal</span></button>
+      <button onclick="showTab('role')">☠<span>Mon rôle</span></button>
+      <button id="spyNav" class="hidden" onclick="showTab('spy')">🕵️<span>Espion</span></button>
+    </aside>
+    <div class="game-main">
+      <div id="questTab" class="tab">
+        <div class="parchment quest-card">
+          <div class="mission-badge">MISSION PRINCIPALE</div>
+          <h3 id="currentStep">...</h3>
+          <p>Fais progresser la quête avec ton équipage.</p>
+          <div class="progress"><span id="progressBar"></span></div>
+          <button id="advanceBtn" class="gold-btn" onclick="advanceQuest()">Contribuer à la quête</button>
+          <button class="dark-btn" onclick="callMeeting()">🗣️ Appeler une réunion</button>
+        </div>
+        <div class="wood-panel steps-card"><h3>Étapes</h3><ol id="steps"></ol></div>
+      </div>
+      <div id="journalTab" class="tab hidden"><div class="parchment journal"><h2>Journal de bord</h2><p>La progression de la quête et les informations utiles apparaissent ici.</p><div id="journalLog"></div></div></div>
+      <div id="roleTab" class="tab hidden"><div class="parchment role-card"><h2>Mon rôle</h2><div id="myRole"></div></div></div>
+      <div id="spyTab" class="tab hidden"><div class="parchment role-card"><h2>🕵️ Pouvoir de l'Espion</h2><p>Découvre une mission d'Imposteur sans connaître son identité.</p><button id="spyBtn" class="gold-btn" onclick="spyReveal()">Révéler une mission</button><div id="spyResult" class="spy-result"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="meeting" class="screen">
+  <div class="meeting-card parchment">
+    <div class="eyebrow">RÉUNION</div><div id="meetingTimer" class="meeting-timer">01:00</div>
+    <h2>Qui suspectes-tu ?</h2>
+    <div id="votePlayers" class="vote-grid"></div>
+    <button id="voteBtn" class="gold-btn" onclick="submitVote()">Valider mon vote</button>
+  </div>
+</section>
+
+<section id="ended" class="screen">
+  <div class="end-card parchment">
+    <div class="end-skull">☠</div><h1 id="endTitle">La partie est terminée</h1><p id="endReason"></p>
+    <button class="gold-btn" onclick="goHome()">Rejouer</button>
+  </div>
+</section>
+
+<section id="help" class="screen">
+  <div class="parchment help-card"><h1>📖 Comment jouer</h1>
+    <h3>🏴‍☠️ Pirates</h3><p>Suivez la quête et faites-la progresser avant la fin du temps.</p>
+    <h3>☠️ Imposteurs</h3><p>Sabotez la quête grâce à votre objectif secret sans vous faire repérer.</p>
+    <h3>🕵️ Espion</h3><p>Si le rôle est activé, un Pirate devient Espion. Une seule fois par partie, il peut découvrir une mission actuelle d'Imposteur, sans connaître son propriétaire.</p>
+    <h3>🗣️ Réunions</h3><p>Discutez, observez les comportements et votez pour éliminer un suspect.</p>
+    <button class="back" onclick="goHome()">← Retour</button>
+  </div>
+</section>
+</main>
+<div id="toast"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
