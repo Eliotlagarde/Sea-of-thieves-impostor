@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: sea-of-thieves-imposteur-v5
-    env: node
-    buildCommand: npm install
-    startCommand: npm start
