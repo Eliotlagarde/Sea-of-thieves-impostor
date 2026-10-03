@@ -1,0 +1,166 @@
+
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sea Imposteur — V6</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="sea-bg"></div>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">☠</span><span>SEA <b>IMPOSTEUR</b></span></div>
+  <div id="roomBadge" class="room-badge hidden"></div>
+</header>
+
+<main>
+<section id="home" class="screen active">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">UNE QUÊTE. UN ÉQUIPAGE. UNE TRAHISON.</div>
+      <h1>Sea <button class="title-skull" onclick="secretSkull()" aria-label="Emblème pirate">☠</button> Thieves</h1><div class="title-sub">— L’IMPOSTEUR —</div>
+      <p>Rejoignez l’équipage… ou semez le doute.</p>
+    </div>
+    <div class="wood-panel menu-panel">
+      <button class="gold-btn" onclick="openCreate()">Jouer</button>
+      <button class="dark-btn" onclick="openHelp()">Aide</button>
+      <button class="dark-btn" onclick="quitGame()">Quitter</button>
+    </div>
+  </div>
+</section>
+
+<section id="create" class="screen">
+  <div class="screen-title"><span>⚓</span><h2>Créer ou rejoindre une partie</h2></div>
+  <div class="split">
+    <div class="parchment card">
+      <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 64 64" width="54" height="54" fill="currentColor"><path d="M30 3h3v41h-3zM35 8v15h16L42 8zM27 9v15H9l10-15zM35 26v14h20L47 26zM27 27v13H5l8-13zM7 44h51l-9 11H19zM4 58q7-4 14 0t14 0 14 0 14 0v3q-7-4-14 0t-14 0-14 0-14 0z"/></svg></div><h3>Créer une partie</h3>
+      <p>Personnalise la partie et invite tes amis.</p>
+      <button class="gold-btn" onclick="showCreateForm()">Créer</button>
+    </div>
+    <div class="parchment card">
+      <div class="card-icon">⎈</div><h3>Rejoindre une partie</h3>
+      <p>Entre le code de la partie pour rejoindre.</p>
+      <label>Ton nom<input id="joinName" maxlength="18" placeholder="Matelot"></label><div class="avatar-label">Ton personnage</div><div id="joinAvatars" class="avatars"></div><div id="joinAvatarPreview" class="avatar-preview"></div><input id="joinCode" placeholder="CODE DE PARTIE" maxlength="6">
+      <button class="gold-btn" onclick="joinRoom()">Rejoindre</button>
+    </div>
+  </div>
+  <button class="back" onclick="goHome()">← Retour</button>
+</section>
+
+<section id="createForm" class="screen">
+  <div class="screen-title"><span>⚓</span><h2>Préparer la traversée</h2></div>
+  <div class="wood-panel form-panel">
+    <label>Ton nom<input id="playerName" maxlength="18" placeholder="Capitaine..."></label>
+    <label>Ton avatar
+      <div id="avatars" class="avatars"></div><div id="avatarPreview" class="avatar-preview"></div>
+    </label>
+    <div class="settings-grid">
+      <label>Durée de la quête
+        <select id="questMinutes"><option>10</option><option>15</option><option>20</option><option selected>30</option><option>45</option><option>60</option></select>
+      </label>
+      <label>Entre les réunions
+        <select id="meetingInterval"><option>4</option><option selected>5</option><option>7</option><option>10</option><option>15</option><option>20</option><option>30</option></select>
+      </label>
+      <label>Durée d'une réunion
+        <select id="meetingSeconds"><option value="39">39 secondes</option><option value="60" selected>1 minute</option><option value="120">2 minutes</option><option value="180">3 minutes</option><option value="240">4 minutes</option></select>
+      </label>
+      <label>Nombre d'Imposteurs
+        <select id="impostors"><option selected>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select>
+      </label>
+    </div>
+    <label class="toggle"><input type="checkbox" id="spyEnabled" checked><span></span> Intégrer le rôle Espion</label>
+    <button class="gold-btn wide" id="saveSettingsBtn" onclick="createRoom()">Créer la cabine</button>
+  </div>
+  <button class="back" onclick="showScreen('create')">← Retour</button>
+</section>
+
+<section id="lobby" class="screen">
+  <div class="screen-title"><span>☠</span><h2>Salon de la partie</h2></div>
+  <div class="lobby-layout">
+    <div class="wood-panel room-card">
+      <div class="code-label">Code de partie</div>
+      <div id="roomCode" class="big-code">------</div>
+      <button class="copy-btn" onclick="copyCode()">Copier</button>
+      <div class="setting-summary" id="settingSummary"></div><div id="selectedVoyage" class="selected-voyage"></div><button id="chooseVoyageBtn" class="gold-btn wide" onclick="openVoyages()">Choisir la quête jouée</button>
+      <button id="editSettingsBtn" class="dark-btn wide hidden" onclick="editSettings()">Modifier les réglages</button><button id="readyBtn" class="dark-btn wide" onclick="toggleReady()">Je suis prêt</button>
+      <button id="startBtn" class="gold-btn wide hidden" onclick="startGame()">Lancer la partie</button>
+    </div>
+    <div class="wood-panel players-card">
+      <div class="players-head"><span>☠ Joueurs</span><span id="count">0/20</span></div>
+      <div id="players"></div>
+    </div>
+  </div>
+  <button class="back" onclick="leaveRoom()">← Quitter la cabine</button>
+</section>
+
+<section id="game" class="screen">
+  <div class="game-top">
+    <div class="timer-card">⎈ <span>Quête</span><b id="questTimer">00:00</b></div>
+    <div class="quest-title"><small>QUÊTE EN COURS</small><h2 id="questTitle">...</h2></div>
+    <div class="timer-card">☠ <span>Réunion</span><b id="nextMeeting">00:00</b></div>
+  </div>
+  <div class="game-layout">
+    <aside class="side-nav">
+      <button onclick="showTab('quest')">⎈<span>Quête</span></button>
+      <button onclick="showTab('journal')">📖<span>Journal</span></button>
+      <button onclick="showTab('role')">☠<span>Mon rôle</span></button>
+      <button id="spyNav" class="hidden" onclick="showTab('spy')">🕵️<span>Espion</span></button>
+    </aside>
+    <div class="game-main">
+      <div id="questTab" class="tab">
+        <div class="parchment quest-card">
+          <div class="mission-badge">⎈ &nbsp; MISSION ACTUELLE</div>
+          <h3 id="currentStep">...</h3>
+          <p>Unis par la quête. Divisés par le secret.</p>
+          <div class="progress"><span id="progressBar"></span></div>
+          <button id="advanceBtn" class="gold-btn" onclick="advanceQuest()">Confirmer cette étape</button>
+          <p id="actionStatus" aria-live="polite"></p><button class="dark-btn" onclick="callMeeting()">🗣️ Appeler une réunion</button>
+        </div>
+        <div id="failurePanel" class="wood-panel failure-panel hidden"></div><div class="wood-panel steps-card"><h3>Étapes</h3><ol id="steps"></ol></div>
+      </div>
+      <div id="journalTab" class="tab hidden"><div class="parchment journal"><h2>Journal de bord</h2><p>Étapes accomplies, sabotages et décisions du conseil.</p><h3>Mes notes privées</h3><textarea id="personalNotes" maxlength="5000" placeholder="Mes observations, mes soupçons…" oninput="notesDirty=true;updateNoteStatus()"></textarea><div class="note-actions"><button class="gold-btn" onclick="saveNotes()">Enregistrer mes notes</button><span id="noteStatus" role="status"></span></div><h3>Historique de l’équipage</h3><div id="journalLog"></div></div></div>
+      <div id="roleTab" class="tab hidden"><div class="parchment role-card"><h2>Mon rôle</h2><div id="myRole"></div><button id="sabotageBtn" class="gold-btn hidden" onclick="sabotage()">Déclarer ma mission accomplie</button><p id="sabotageStatus"></p><p class="manual-rule">Les actions se réalisent dans Sea of Thieves. Une déclaration d’échec est arbitrée par le capitaine, sans révéler l’identité de son auteur.</p></div></div>
+      <div id="spyTab" class="tab hidden"><div class="parchment role-card"><h2>🕵️ Pouvoir de l'Espion</h2><p>Découvre une mission d'Imposteur sans connaître son identité.</p><button id="spyBtn" class="gold-btn" onclick="spyReveal()">Révéler une mission d’Imposteur</button><div id="spyResult" class="spy-result"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="meeting" class="screen">
+  <div class="meeting-card wood-panel">
+    <div class="eyebrow">RÉUNION</div><div id="meetingTimer" class="meeting-timer">01:00</div>
+    <h2>Qui suspectes-tu ?</h2>
+    <button class="dark-btn" onclick="meetingRole()">Consulter mon rôle</button><button class="dark-btn" onclick="openNotebook()">Mes notes privées</button><div id="meetingFailure"></div><div id="meetingRole" class="hidden"></div><p id="voteStatus"></p><div id="votePlayers" class="vote-grid"></div>
+    <button id="voteBtn" class="gold-btn" onclick="submitVote()">Valider mon vote</button>
+  </div>
+</section>
+
+<section id="ended" class="screen">
+  <div class="end-card wood-panel">
+    <div class="end-skull">☠</div><h1 id="endTitle">La partie est terminée</h1><p id="endReason"></p>
+    <div id="endCrew" class="end-crew"></div><div id="endStats"></div><button class="gold-btn" onclick="goHome()">Rejouer</button>
+  </div>
+</section>
+
+<section id="help" class="screen">
+  <div class="parchment help-card"><h1>📖 Comment jouer</h1>
+    <h3>🏴‍☠️ Pirates</h3><p>Suivez la quête et faites-la progresser avant la fin du temps.</p>
+    <h3>☠️ Imposteurs</h3><p>Accomplissez votre mission dans Sea of Thieves, puis déclarez-la dans votre onglet privé. Le capitaine arbitre l’échec sans connaître l’auteur de la déclaration. Ne déclarez une perte de butin que si l’objet a été abandonné et n’a pas été récupéré.</p><h3>⎈ Quête commune</h3><p>Choisissez dans le salon le voyage réellement lancé dans Sea of Thieves. Le capitaine confirme les étapes accomplies et l’échec éventuel. L’application accompagne la partie ; elle ne détecte pas les actions dans Sea of Thieves. Les fables sans navire accessible nécessitent une mission personnalisée adaptée.</p>
+    <h3>🕵️ Espion</h3><p>Si le rôle est activé, un Pirate devient Espion. Une seule fois par partie, il peut découvrir une mission actuelle d'Imposteur, sans connaître son propriétaire.</p>
+    <h3>🗣️ Réunions</h3><p>Discutez de vive voix ou sur votre canal habituel, puis votez en secret. Une égalité ou une majorité pour « Passer » n’élimine personne. Les éliminés restent spectateurs. Le temps de quête continue pendant les réunions.</p>
+    <button class="back" onclick="goHome()">← Retour</button>
+  </div>
+</section>
+<section id="voyages" class="screen">
+ <div class="screen-title"><span>⎈</span><h2>Table des quêtes</h2></div>
+ <div class="voyage-table wood-panel"><div id="companyTabs" class="company-tabs" role="group" aria-label="Compagnies"></div>
+ <div class="voyage-layout"><aside><h3 id="companyName"></h3><div id="categoryList" class="category-list"></div></aside><div><div class="voyage-toolbar"><h3 id="categoryName"></h3><input id="voyageSearch" type="search" placeholder="Rechercher un voyage…" oninput="renderVoyages()" aria-label="Rechercher un voyage"></div><div id="voyageCards" class="voyage-cards"></div></div></div>
+ <div class="voyage-detail"><h3 id="voyageChoice">Choisis ton voyage</h3><p id="voyageDescription"></p><label>Nom exact affiché dans ton jeu <small>(facultatif hors quête personnalisée)</small><input id="voyageTitle" maxlength="100" placeholder="Nom du voyage choisi dans Sea of Thieves"></label><div id="customQuestFields" class="hidden"><details id="missionOverrides"><summary>Adapter les étapes et les missions à votre partie</summary><p class="catalog-note">Vérifiez que chaque mission est réalisable. Pour une fable, saisissez au moins une mission adaptée aux objets ou actions effectivement présents.</p><label>Étapes communes — une par ligne<textarea id="customSteps" placeholder="Préparer le voyage&#10;Accomplir les objectifs&#10;Terminer la quête"></textarea></label><label>Missions d’Imposteurs réalisables — une par ligne<textarea id="customMissions" placeholder="Une action concrète qui fait échouer votre quête"></textarea></label></details></div><button id="confirmVoyageBtn" class="gold-btn" disabled onclick="confirmVoyage()">Choisir cette quête pour l’équipage</button><p class="catalog-note">Les titres confirmés reprennent vos captures. Les autres cartes présentent une famille de voyage : précisez son nom exact si nécessaire. Les îles et objectifs détaillés restent ceux de votre partie.</p></div></div><button class="back" onclick="showScreen('lobby')">← Retour au salon</button>
+</section></main>
+<dialog id="easterEgg" class="easter-dialog"><button class="dialog-close" onclick="$('easterEgg').close()" aria-label="Fermer">×</button><p>☠ Un trésor bien caché…</p><img src="/images/hidden-treasure.jpeg" alt="Le trésor secret du navire"><button class="gold-btn" onclick="$('easterEgg').close()">Retour au pont</button></dialog>
+<dialog id="notebook" class="parchment notebook-dialog"><h2>Mes notes privées</h2><textarea id="meetingNotes" maxlength="5000" oninput="notesDirty=true; $('personalNotes').value=this.value;updateNoteStatus()"></textarea><button class="gold-btn" onclick="saveNotes()">Enregistrer</button><button class="dark-btn" onclick="$('notebook').close()">Fermer</button><p id="meetingNoteStatus" role="status"></p></dialog>
+<div id="toast" role="status"></div><div id="connectionStatus" role="status"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/voyages.js"></script><script src="/app.js"></script>
+</body>
+</html>
